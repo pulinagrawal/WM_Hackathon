@@ -63,8 +63,15 @@ class Agent(TorchModelV2, nn.Module):
     flat_observation_space = spaces.Box(low=self.custom_model_config["observation_min"],
                                         high=self.custom_model_config["observation_max"],
                                         shape=space.shape, dtype=np.float32)
+#                                        shape=(space.shape[0]+3,), dtype=np.float32)
 
     # TODO: Transform to output of any other PyTorch and pass new shape to model.
+
+    ################ TRY - add 3 to observation space
+    #additional_observation_space = spaces.Box(low=0,
+    #                                    high=self.custom_model_config["observation_max"],
+    #                                    shape=3, dtype=np.float32)    
+    ################ END TRY
 
     # Create default model (for RL)
     TorchModelV2.__init__(self, flat_observation_space, action_space, num_outputs, model_config, name)

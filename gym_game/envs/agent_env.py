@@ -304,6 +304,18 @@ class AgentEnv(gym.Env):
     # Update agent brain with new observations
     tx_obs = self.forward_observation(obs)
 
+    ###### TRY - add bits to objs to indicate game type - shape\color\position
+    # flatten
+#    obs_4d = tx_obs.float()
+#    volume = np.prod(obs_4d.shape[1:])  # calculate volume as vector excl. batch dim
+#    obs_3d_shape = [obs_4d.shape[0], volume]  # [batch size, volume]
+#    obs_3d = torch.reshape(obs_4d, obs_3d_shape)
+
+#    tmp = tx_obs['full'].view(-1)
+#    tmp = torch.cat([tmp, torch.Tensor([0, 0, 0])])
+#    emit = [tmp, self.reward, is_end_state, additional]
+    ##### END TRY
+
     emit = [tx_obs, self.reward, is_end_state, additional]
 
     # The purpose of this section is to verify that valid observations are emitted.

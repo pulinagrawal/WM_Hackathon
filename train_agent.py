@@ -62,7 +62,10 @@ print("ACTIONS={}".format(ACTIONS))
 # Some general preparations... 
 render_mode = 'rgb_array'
 ray.shutdown()
-ray.init(ignore_reinit_error=True)
+#default from repo 
+#ray.init(ignore_reinit_error=True)
+#to run in 1 process for debugging 
+ray.init(ignore_reinit_error=True,local_mode=True)
 
 # Build agent config
 agent_config = {}

@@ -14,7 +14,7 @@ class PrefrontalCortex(nn.Module):
     super().__init__()
     self._name = name
     self._config = config
-    self._wm = deque([],18)
+    self._wm = deque([], 36)
     self._build()
 
   def _build(self):

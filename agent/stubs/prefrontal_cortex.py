@@ -62,7 +62,7 @@ class PrefrontalCortex(nn.Module):
       self.last_action = bg_action
 
       if bg_action < 3: 
-        self._wm = deque([],18)
+        self._wm.clear()
         self._wm.append(self.sample_input)
     
     # if (len(self._wm) > 18):

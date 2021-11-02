@@ -253,15 +253,15 @@ class AgentEnv(gym.Env):
     mtl_out = mtl.forward(what_where_obs_dict_delayed)
 
     pfc = self.modules[self.MODULE_PFC]
-    env_obs_dict, _ = pfc.forward(what_where_obs_dict, mtl_out, bg_action=None)
+    env_obs_dict, _ = pfc.forward(what_where_obs_dict, mtl_out, bg_action=None, reward=None)
     env_obs_dict_delayed = self.pfc_output_buffer.next_message(env_obs_dict)
 
     return env_obs_dict_delayed
 
-  def forward_action(self, bg_action):
+  def forward_action(self, bg_action, reward):
 
     pfc = self.modules[self.MODULE_PFC]
-    _, pfc_action = pfc.forward(None, None, bg_action)
+    _, pfc_action = pfc.forward(None, None, bg_action, reward)
 
     sc = self.modules[self.MODULE_SC]
     sc_action = sc.forward(pfc_action)
@@ -296,7 +296,7 @@ class AgentEnv(gym.Env):
       start = timer()
 
     # Update PFC with current action, which flow through to motor actions
-    env_action = self.forward_action(action)
+    env_action = self.forward_action(action, self.reward)
 
     # Update the game env, based on actions originating in PFC (and direct from Actor)
     [obs, self.reward, is_end_state, additional] = self.env.step(env_action)

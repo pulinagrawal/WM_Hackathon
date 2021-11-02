@@ -67,13 +67,15 @@ class PrefrontalCortex(nn.Module):
     
     # if (len(self._wm) > 18):
     #   self._wm.pop(0)
-    
-    flat_wm =  np.max(self._wm, axis=0)
-    pfc_observation = { "full": flat_wm }
     pfc_action = bg_action
+    pfc_observation = what_where_obs_dict 
+    if what_where_obs_dict != None: 
+      flat_wm =  np.max(self._wm, axis=0)
+      pfc_observation["fovea"] = flat_wm
 
 
-    pfc_observation = what_where_obs_dict
+
+    #pfc_observation = what_where_obs_dict
 #    pfc_observation = self._wm # what_where_obs_dict
     # print("======> Agent: bg_action", bg_action)
 

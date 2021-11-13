@@ -16,14 +16,16 @@ class PrefrontalCortex(nn.Module):
     self._config = config
     self._wm = deque([],18)
     self.start = True
+    self.episode_start = True
     self._build()
     self.last_action = None
     self.LEFT_BUTTON = 1
     self.RIGHT_BUTTON = 2
+    self.SAMPLE = 0
     self.grids = {
-                  0: [8, 13, 7, 9],
-                  self.LEFT_BUTTON:  [12, 17],
-                  self.RIGHT_BUTTON:  [14, 19],
+                  0: [4],
+                  self.LEFT_BUTTON:  [6],
+                  self.RIGHT_BUTTON:  [8],
                  }
 
   def _build(self):
@@ -51,10 +53,37 @@ class PrefrontalCortex(nn.Module):
     # If overlap overlaps with task representation send sample grid representation.
 
     if self.start and what_where_obs_dict != None:
-      self.sample_input = np.zeros_like( what_where_obs_dict["fovea"])
-      self._wm.append(self.sample_input)
+      self.sample_input = np.ones_like( what_where_obs_dict["fovea"])
+      self._wm.append([0, self.sample_input])
       self.start = False
       
+    if (what_where_obs_dict != None) and self.last_action in sum(self.grids.values(),[]):
+      self._wm.append([self.last_action, what_where_obs_dict["fovea"]])
+    
+    self.task_repr = self._wm[-1][1]
+    if bg_action != None:
+      self.last_action = bg_action
+
+    pfc_action = bg_action
+    pfc_observation = what_where_obs_dict 
+    return pfc_observation, pfc_action
+    '''
+    # Building task representation during tutoring and game
+    if bg_action in [self.LEFT_BUTTON, self.RIGHT_BUTTON]:
+      if reward == 0.0:
+        # TUTORING
+        if not self.episode_start:
+          self.episode_start = True
+          self.task_representation = self.sample_input
+        this_task_representation = button_representation + sample_representation
+      else:
+        # TASK
+        self.episode_start = False
+        if reward > 0:
+          this_task_representation = button_representation + sample_representation
+        elif reward < 0:
+          this_task_representation = other_button_representation + sample_representation
+
     if (what_where_obs_dict != None) and self.last_action in sum(self.grids.values(),[]):
       self._wm.append(what_where_obs_dict["fovea"])
     
@@ -70,8 +99,9 @@ class PrefrontalCortex(nn.Module):
     pfc_action = bg_action
     pfc_observation = what_where_obs_dict 
     if what_where_obs_dict != None: 
-      flat_wm =  np.max(self._wm, axis=0)
-      pfc_observation["fovea"] = flat_wm
+      pfc_observation["task_repr"] = self.task_representation
+      pfc_observation["left_overlap"] = self.task_representation
+      pfc_observation["right_overlap"] = self.task_representation
 
 
 
@@ -79,10 +109,9 @@ class PrefrontalCortex(nn.Module):
 #    pfc_observation = self._wm # what_where_obs_dict
     # print("======> Agent: bg_action", bg_action)
 
+'''
 
 
-
-    return pfc_observation, pfc_action
 
 ''' Alternate
   def forward(self, what_where_obs_dict, mtl_out, bg_action, reward):

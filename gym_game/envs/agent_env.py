@@ -1,4 +1,5 @@
 import math
+import cv2
 import json
 from collections import deque
 from timeit import default_timer as timer
@@ -297,10 +298,30 @@ class AgentEnv(gym.Env):
 
     # Update PFC with current action, which flow through to motor actions
     env_action = self.forward_action(action, self.reward)
-
+    cv2.destroyAllWindows()
     # Update the game env, based on actions originating in PFC (and direct from Actor)
     [obs, self.reward, is_end_state, additional] = self.env.step(env_action)
-
+    img = obs['fovea'].transpose(1,2,0)
+    scale_percent = 2*1000 # percent of original size
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+      
+    # resize image
+    resized1 = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+    img = obs['peripheral'].transpose(1,2,0)
+    scale_percent = 3*1000 # percent of original size
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+      
+    # resize image
+    resized2 = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+    task_repr_tensor = self.obs_to_tensor([self.modules['pfc'].task_repr], 0)
+    task_repr_img = {}
+    self.tensor_to_obs(self.modules['fovea']._modules['cortex'].decode(task_repr_tensor), task_repr_img, 'task_repr')
+    cv2.imshow('peri', np.hstack([resized2, resized1]))
+    cv2.imshow('per', resized2)
     # Update agent brain with new observations
     tx_obs = self.forward_observation(obs)
 

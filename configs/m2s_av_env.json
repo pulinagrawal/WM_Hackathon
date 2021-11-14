@@ -17,8 +17,8 @@
 
   "gameTypes":["shape"],
   "txTypes":["None"],
-  "colors": ["LB", "LG", "Pink", "DB"],
-  "shapes": ["Barred_Ring", "Triangle", "Cross", "Heart"],
+  "colors": ["LB", "LG", "PINK", "DB", "YELLOW"],
+  "shapes": ["Barred_Ring", "Triangle", "Cross", "Square"],
 
   "enable_active_vision": 1,
   "summaries": false,

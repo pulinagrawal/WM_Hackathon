@@ -3,6 +3,7 @@ channels:
   - defaults
 dependencies:
   - python==3.6.2
+  - pip==21.0.1
   - pip:
       - gym==0.17.2
       - numpy==1.19.1

@@ -1,19 +1,24 @@
 {
   "obs_keys": {
-    "visual": ["fovea", "peripheral"],
-    "pe": ["gaze"]
+    "visual": [
+      "fovea",
+      "peripheral"
+    ],
+    "pe": [
+      "gaze"
+    ]
   },
   "mtl_max_length": 6,
   "mtl_input_delay_size": 1,
   "pfc_output_delay_size": 1,
   "fovea": {
-    "summaries": false,
+    "summaries": true,
     "load": "checkpoints/fovea.pt",
     "retina": {
       "f_size": 7,
       "f_sigma": 2.0,
       "f_k": 1.6,
-      "summaries": false
+      "summaries": true
     },
     "cortex": {
       "filters": 100,
@@ -35,13 +40,13 @@
     }
   },
   "peripheral": {
-    "summaries": false,
+    "summaries": true,
     "load": "checkpoints/peripheral.pt",
     "retina": {
       "f_size": 7,
       "f_sigma": 2.0,
       "f_k": 1.6,
-      "summaries": false
+      "summaries": true
     },
     "cortex": {
       "filters": 100,

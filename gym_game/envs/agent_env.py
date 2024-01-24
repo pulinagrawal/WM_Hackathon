@@ -1,4 +1,5 @@
 import math
+import cv2
 import json
 from collections import deque
 from timeit import default_timer as timer
@@ -253,15 +254,15 @@ class AgentEnv(gym.Env):
     mtl_out = mtl.forward(what_where_obs_dict_delayed)
 
     pfc = self.modules[self.MODULE_PFC]
-    env_obs_dict, _ = pfc.forward(what_where_obs_dict, mtl_out, bg_action=None)
+    env_obs_dict, _ = pfc.forward(what_where_obs_dict, mtl_out, bg_action=None, reward=None)
     env_obs_dict_delayed = self.pfc_output_buffer.next_message(env_obs_dict)
 
     return env_obs_dict_delayed
 
-  def forward_action(self, bg_action):
+  def forward_action(self, bg_action, reward):
 
     pfc = self.modules[self.MODULE_PFC]
-    _, pfc_action = pfc.forward(None, None, bg_action)
+    _, pfc_action = pfc.forward(None, None, bg_action, reward)
 
     sc = self.modules[self.MODULE_SC]
     sc_action = sc.forward(pfc_action)
@@ -296,13 +297,45 @@ class AgentEnv(gym.Env):
       start = timer()
 
     # Update PFC with current action, which flow through to motor actions
-    env_action = self.forward_action(action)
-
+    env_action = self.forward_action(action, self.reward)
+    cv2.destroyAllWindows()
     # Update the game env, based on actions originating in PFC (and direct from Actor)
     [obs, self.reward, is_end_state, additional] = self.env.step(env_action)
-
+    img = obs['fovea'].transpose(1,2,0)
+    scale_percent = 2*1000 # percent of original size
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+      
+    # resize image
+    resized1 = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+    img = obs['peripheral'].transpose(1,2,0)
+    scale_percent = 3*1000 # percent of original size
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+      
+    # resize image
+    resized2 = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+    task_repr_tensor = self.obs_to_tensor([self.modules['pfc'].task_repr], 0)
+    task_repr_img = {}
+    self.tensor_to_obs(self.modules['fovea']._modules['cortex'].decode(task_repr_tensor), task_repr_img, 'task_repr')
+    cv2.imshow('peri', np.hstack([resized2, resized1]))
+    cv2.imshow('per', resized2)
     # Update agent brain with new observations
     tx_obs = self.forward_observation(obs)
+
+    ###### TRY - add bits to objs to indicate game type - shape\color\position
+    # flatten
+#    obs_4d = tx_obs.float()
+#    volume = np.prod(obs_4d.shape[1:])  # calculate volume as vector excl. batch dim
+#    obs_3d_shape = [obs_4d.shape[0], volume]  # [batch size, volume]
+#    obs_3d = torch.reshape(obs_4d, obs_3d_shape)
+
+#    tmp = tx_obs['full'].view(-1)
+#    tmp = torch.cat([tmp, torch.Tensor([0, 0, 0])])
+#    emit = [tmp, self.reward, is_end_state, additional]
+    ##### END TRY
 
     emit = [tx_obs, self.reward, is_end_state, additional]
 

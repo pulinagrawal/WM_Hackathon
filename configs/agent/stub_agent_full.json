@@ -1,12 +1,12 @@
 {
-  "training":{
+  "training": {
     "training_steps": 30,
-    "training_epochs": 500,
+    "training_epochs": 50,
     "evaluation_steps": 5,
     "evaluation_interval": 2,
     "checkpoint_interval": -1
   },
-  "agent":{
+  "agent": {
     "num_workers": 1,
     "num_gpus": 0,
     "num_gpus_per_worker": 0,
@@ -15,6 +15,9 @@
   },
   "model": {
     "use_lstm": false,
-    "fcnet_hiddens":[256, 256]
+    "fcnet_hiddens": [
+      256,
+      256
+    ]
   }
 }
